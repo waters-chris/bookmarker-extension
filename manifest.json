@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Hello Extensions V2",
+  "description": "Base Level Extension",
+  "version": "1.0",
+  "permissions": ["sidePanel", "contextMenus"],
+  "background": {
+    "service_worker": "sample.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel-global.html"
+  }
+}

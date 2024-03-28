@@ -7,7 +7,8 @@
   "background": {
     "service_worker": "sample.js"
   },
-  "side_panel": {
-    "default_path": "sidepanel-global.html"
-  }
+  "content_scripts": [{
+    "js": ["scripts/content.js"],
+    "matches":["<all_urls>"]
+  }]
 }

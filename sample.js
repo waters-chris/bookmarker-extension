@@ -15,6 +15,9 @@
 
 console.log("inside Sample.js")
 
+var globalClickedElement = null;
+var globalClickedTabId   = null;
+
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
       id: 'openSidePanel',
@@ -25,15 +28,36 @@ chrome.runtime.onInstalled.addListener(() => {
   });
   
   chrome.contextMenus.onClicked.addListener((info, tab) => {
+    console.log("content mencu OnCLick")
     if (info.menuItemId === 'openSidePanel') {
+      console.log("openingi side pane;")
       // This will open the panel in all the pages on the current window.
       chrome.sidePanel.open({ windowId: tab.windowId });
+    // } else {
+    //   console.log("not  side panel: ", info, tab)
+    //   chrome.tabs.sendMessage(tab.id, "getClickedEl", {frameId: info.frameId}, data => {opening
+    //     console.log("inside sendMessage:", info, data)
+    //     elt.value = data.value;
+    // });
     }
   });
   
+  // chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  //   console.log("In this other listener: ");
+  //   console.log("  >>  request: ", request);
+  //   console.log("  >>  sender: ", sender);
+  //   console.log("  >> sendResponse: ", sendResponse);
+  //     if(request == "getClickedEl") {
+  //       console.log("element cloicked?")
+  //         sendMessage({value: clickedEl.value});
+  //     }
+  // });
+
   chrome.runtime.onMessage.addListener((message, sender) => {
     // The callback for runtime.onMessage must return falsy if we're not sending a response
+    
     (async () => {
+      console.log("message: ", message, "sender:", sender);
       if (message.type === 'open_side_panel') {
         // This will open a tab-specific side panel only on the current tab.
         await chrome.sidePanel.open({ tabId: sender.tab.id });
@@ -42,20 +66,15 @@ chrome.runtime.onInstalled.addListener(() => {
           path: 'sidepanel-tab.html',
           enabled: true
         });
+      } else if (message.value) {
+        globalClickedElement = message.value;
+        globalClickedTabId = sender.tab.id;
       }
     })();
   });
-
-
-
-
-
-
-
-
-
-
-
+  
+  
+  
 
 // A generic onclick callback function.
 chrome.contextMenus.onClicked.addListener(genericOnClick);
@@ -63,6 +82,7 @@ chrome.contextMenus.onClicked.addListener(genericOnClick);
 
 // A generic onclick callback function.
 function genericOnClick(info) {
+  console.log("Generic On Click: ", info)
 
   switch (info.menuItemId) {
     case 'radio':
@@ -91,7 +111,7 @@ function requestCsrfToken() {
     .then(responseText => {
           // Printing our response
           console.log("success!: and the response is...")
-          console.log(responseText);
+          // console.log(responseText);
   
           const re = new RegExp(/<meta name="csrf-token" content="([^"]+)" \/>/);
           var potential_csrf_token = re.exec(responseText)[1];
@@ -110,6 +130,7 @@ function requestCsrfToken() {
 
 function handleSelection(selectionInfo) {
   console.log("Selection made:", selectionInfo);
+  console.log("Global :", globalClickedElement);
 
   console.log("Requesting CSRF Token");
   var url = 'http://localhost:3000';
@@ -119,7 +140,7 @@ function handleSelection(selectionInfo) {
     .then(responseText => {
           // Printing our response
           console.log("success!: and the response is...")
-          console.log(responseText);
+          // console.log(responseText);
   
           const re = new RegExp(/<meta name="csrf-token" content="([^"]+)" \/>/);
           var potential_csrf_token = re.exec(responseText)[1];
@@ -146,7 +167,7 @@ function handleSelection(selectionInfo) {
 
     console.log("CSRF TOKTEN 2: ", actual_csrf_token);
 
-      var url = 'http://localhost:3000/bookmarks';
+      var url = 'http://localhost:3000/bookmarks.json';
       var payload = new FormData();
       const headers = {
         'X-CSRF-Token': actual_csrf_token
@@ -155,7 +176,8 @@ function handleSelection(selectionInfo) {
       const bookmarkPayload = {
         bookmark: {
           url: selectionInfo.pageUrl, 
-          selected_text: selectionInfo.selectionText
+          selected_text: selectionInfo.selectionText,
+          wrapping_element: globalClickedElement
         }
       }
       
@@ -175,15 +197,20 @@ function handleSelection(selectionInfo) {
       fetch(url, { method: 'POST', body: payload })
       .then(response => response.text())
       .then(responseText => {
+          console.log("fetch() has finished successfully")
+          
+          
+
             // Printing our response 
-            console.log(responseText);
+            // console.log(responseText);
+            console.log("Wantring to send messae now: ", globalClickedTabId)
+                  chrome.tabs.sendMessage(globalClickedTabId, {message: responseText});
       })
       .catch(errorMsg => console.log(errorMsg));
-
+// 
     };
 
     submitSelection(selectionInfo);
-
 }
 
 
@@ -241,12 +268,12 @@ chrome.runtime.onInstalled.addListener(function () {
 
   // Intentionally create an invalid item, to show off error checking in the
   // create callback.
-  chrome.contextMenus.create(
-    { title: 'Oops', parentId: 999, id: 'errorItem' },
-    function () {
-      if (chrome.runtime.lastError) {
-        console.log('Got expected error: ' + chrome.runtime.lastError.message);
-      }
-    }
-  );
+  // chrome.contextMenus.create(
+  //   { title: 'Oops', parentId: 999, id: 'errorItem' },
+  //   function () {
+  //     if (chrome.runtime.lastError) {
+  //       console.log('Got expected error: ' + chrome.runtime.lastError.message);
+  //     }
+  //   }
+  // );
 });

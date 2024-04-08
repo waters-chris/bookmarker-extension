@@ -18,8 +18,8 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   (async () => {
     console.log("message: ", message, "sender:", sender);
 
-    if (message.value) {
-      recordClickedElement(message.value, sender.tab.id);
+    if (message.bookmarkerClickedElement) {
+      recordClickedElement(message.bookmarkerClickedElement, sender.tab.id);
     } else if (message.fetchBookmarkContent) {
         sendBookmarkContentToTab(message.fetchBookmarkContent, sender.tab.id)
     } else {
@@ -34,7 +34,7 @@ function sendBookmarkContentToTab(url, tabId) {
   chrome.storage.sync.get(['bookmarker_v1']).then((retrievedData) => {
 
     if (retrievedData && retrievedData['bookmarker_v1'] && retrievedData['bookmarker_v1'][url]) {
-      console.log("Sending reply")
+      console.log("Sending reply: ", retrievedData['bookmarker_v1'][url])
       chrome.tabs.sendMessage(tabId, {bookmarkContent: retrievedData['bookmarker_v1'][url]})
     }
   });
@@ -74,6 +74,9 @@ function storeLocally(thingsToStore, clickedElement) {
       wrapping_element: clickedElement
     })
   
+    console.log("thisBookmark:", thisBookmark);
+    console.log("Clicked element: ", clickedElement)
+
     storedBookmarks[thingsToStore.pageUrl] = thisBookmark;
   
     chrome.storage.sync.set({bookmarker_v1: storedBookmarks}).then(() => {

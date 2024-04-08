@@ -15,14 +15,13 @@ if (body) {
   console.log("Denied:  no body")
 }
 
-
 var clickedEl = null;
 
 document.addEventListener("contextmenu", function(event){
   console.log("contentmenu vent listener: ", event);
-    clickedEl = event.target;
-    console.log("clickedEl: ", clickedEl);
-    chrome.runtime.sendMessage({value: clickedEl.outerHTML});
+  clickedEl = event.target;
+  console.log("clickedEl: ", clickedEl);
+  chrome.runtime.sendMessage({bookmarkerClickedElement: clickedEl.outerHTML});
 }, true);
 
 chrome.runtime.onMessage.addListener((message) => {
@@ -58,6 +57,10 @@ function applyBookmarkContent(bookmarkContent) {
 
     var tempElement = document.createElement('div');
     tempElement.innerHTML = wrapping_element;
+
+    if (tempElement.children.length == 0) {
+      return;
+    }
 
     var wrapping_class = tempElement.children[0].className;
     var wrapping_id = tempElement.children[0].id;

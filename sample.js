@@ -32,15 +32,15 @@ function sendBookmarkContentToTab(url, tabId) {
   console.log("FetchBookmark content for", url);
 
   chrome.storage.sync.get(['bookmarker_v1']).then((retrievedData) => {
-
+    
     if (retrievedData && retrievedData['bookmarker_v1'] && retrievedData['bookmarker_v1'][url]) {
       console.log("Sending reply: ", retrievedData['bookmarker_v1'][url])
       chrome.tabs.sendMessage(tabId, {bookmarkContent: retrievedData['bookmarker_v1'][url]})
     }
   });
 }
-  
-  
+
+
 chrome.contextMenus.onClicked.addListener(genericOnClick);
 
 function genericOnClick(info) {
@@ -48,11 +48,37 @@ function genericOnClick(info) {
     case 'selection':
         handleSelection(info);
         break;
-    default:
-      // no op
-  }
-}
+        default:
+          // no op
+        }
+      }
+      
+function identifyWrappingElement(element) {
 
+  const classRegExp = new RegExp(/ class="([^"]+)"/)
+  const idRegExp = new RegExp(/ id="([^"]+)/)
+  const elementTypeRegExp = new RegExp(/<\/([a-z0-9]+)>$/i);
+ 
+  var returnObject = {};
+
+  var classMatch = element.match(classRegExp);
+
+  if (classMatch != null) {
+    returnObject.class = classMatch[1];
+  }
+
+  var idMatch = element.match(idRegExp)
+  if (idMatch != null) {
+    returnObject.id = idMatch[1];
+  }
+
+  var typeMatch = element.match(elementTypeRegExp)
+  if (typeMatch != null) {
+    returnObject.element_type = typeMatch[1];
+  }
+  
+  return returnObject;
+}
 
 function storeLocally(thingsToStore, clickedElement) {
   console.log("About to store:", thingsToStore);
@@ -71,7 +97,7 @@ function storeLocally(thingsToStore, clickedElement) {
     thisBookmark ||= [];
     thisBookmark.push({
       selected_text:    thingsToStore.selectionText,
-      wrapping_element: clickedElement
+      wrapping_element: identifyWrappingElement(clickedElement)
     })
   
     console.log("thisBookmark:", thisBookmark);
@@ -94,6 +120,7 @@ async function handleSelection(selectionInfo) {
 
   console.log("done");
 }
+
 
 
 

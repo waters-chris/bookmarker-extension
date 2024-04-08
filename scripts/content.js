@@ -55,16 +55,9 @@ function applyBookmarkContent(bookmarkContent) {
       return;
     }
 
-    var tempElement = document.createElement('div');
-    tempElement.innerHTML = wrapping_element;
-
-    if (tempElement.children.length == 0) {
-      return;
-    }
-
-    var wrapping_class = tempElement.children[0].className;
-    var wrapping_id = tempElement.children[0].id;
-    var wrapping_element_type = tempElement.children[0].tagName;
+    var wrapping_class = wrapping_element.class;
+    var wrapping_id = wrapping_element.id;
+    var wrapping_element_type = wrapping_element.element_type;
 
     var identifiedNodeSelector =  wrapping_element_type;
     if (wrapping_id) {

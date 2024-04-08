@@ -28,27 +28,28 @@ document.addEventListener("contextmenu", function(event){
 chrome.runtime.onMessage.addListener((message) => {
   console.log("Tab Message received: ", message);
 
-  const json = JSON.parse(message.message);
-  setNewContent(json);
+  if (message.bookmarkContent) {
+    // const json = JSON.parse(message.bookmarkContent);
+    setNewContent(message.bookmarkContent);
+  }
 })
 
-const url = 'http://localhost:3000/bookmarks.json?url=' + encodeURIComponent(document.location.href);
+// const url = 'http://localhost:3000/bookmarks.json?url=' + encodeURIComponent(document.location.href);
+const url = document.location.href;
 
-function setNewContent(newContent) {
+function applyBookmarkContent(bookmarkContent) {
 
-
-  if (newContent == null) {
+  if (bookmarkContent == null) {
     // nothing to do
     return;
   }
-  // const re = new RegExp(/<meta name="csrf-token" content="([^"]+)" \/>/);
-  // csrf_token = re.exec(newContent)[0];
 
   const existingContent = document.querySelector('#bookmarker-extension');
 
   if (existingContent) {
     existingContent.innerHTML = "<strong>Found !</strong>";
-    let wrapping_element = newContent.wrapping_element;
+    console.log("NewConent: ", bookmarkContent)
+    let wrapping_element = bookmarkContent.wrapping_element;
     console.log("Wrapping Element: ", wrapping_element);
     // if there's nothing to identify where it goes then we'll ignore it
     if (wrapping_element == 'null') {
@@ -76,7 +77,7 @@ identifiedNodes
     let identifiedNode = null;
     for (var i = 0; i < identifiedNodes.length; i++) { 
       let node = identifiedNodes[i];
-      if (node.innerText.search(newContent.selected_text) != -1) {
+      if (node.innerText.search(bookmarkContent.selected_text) != -1) {
         identifiedNode = node;
       }
     }
@@ -85,37 +86,52 @@ identifiedNodes
     
     if (identifiedNode) {
       console.log("Identified Note:", identifiedNode)
-      identifiedNode.innerHTML = identifiedNode.innerHTML.replace(newContent.selected_text, '<span style="background-color: red;">' + newContent.selected_text  + '</span>')
+      identifiedNode.innerHTML = identifiedNode.innerHTML.replace(bookmarkContent.selected_text, '<span style="background-color: red;">' + bookmarkContent.selected_text  + '</span>')
       //identifiedNode.innerHTML = '<span style="background-color: red;">' + identifiedNode.innerHTML + '</span>';
     }
 
+  }  
+}
+
+
+function setNewContent(newContent) {
+
+  if (newContent == null) {
+    // nothing to do
+    return;
   }
-  
+
+  console.log("New Content to write: ", newContent.length)
+  for (var i = 0; i < newContent.length; i++) {
+    applyBookmarkContent(newContent[i]);
+  }
 }
 
 // console.log("Aboutt o submit no-cors request");
 // console.log("CSRF TOKEN 1: ", csrf_token);
 
 const fetchBookmarkContent = async(url) => {
+  console.log("About to fetch bookmark content for:", url)
+  chrome.runtime.sendMessage({fetchBookmarkContent: url})
 
-  const bookmark_for_url = fetch(url, { method: 'GET' })
-    .then(response => response.json())
-    .then(responseJson => {
-          // Printing our response
-          console.log("content success!: and the response is...")
-          console.log(responseJson);
-          return responseJson;
-    })
-    .catch(errorMsg => {
-      console.log("Broken:");
-      console.log(errorMsg)
-    });
+//   const bookmark_for_url = fetch(url, { method: 'GET' })
+//     .then(response => response.json())
+//     .then(responseJson => {
+//           // Printing our response
+//           console.log("content success!: and the response is...")
+//           console.log(responseJson);
+//           return responseJson;
+//     })
+//     .catch(errorMsg => {
+//       console.log("Broken:");
+//       console.log(errorMsg)
+//     });
 
-  const bookmark_content = await bookmark_for_url;
-console.log("All teh book marks:", bookmark_content)
-  for (var i = 0; i < bookmark_content.length; i++) {
-    setNewContent(bookmark_content[i]);  
-  } 
+//   const bookmark_content = await bookmark_for_url;
+// console.log("All teh book marks:", bookmark_content)
+//   for (var i = 0; i < bookmark_content.length; i++) {
+//     setNewContent(bookmark_content[i]);  
+//   } 
 }
 
 fetchBookmarkContent(url);

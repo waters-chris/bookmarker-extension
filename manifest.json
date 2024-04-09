@@ -5,10 +5,10 @@
   "version": "1.0",
   "permissions": ["sidePanel", "contextMenus", "storage"],
   "background": {
-    "service_worker": "sample.js"
+    "service_worker": "background.js"
   },
   "content_scripts": [{
-    "js": ["scripts/content.js"],
+    "js": ["scripts/page_content.js"],
     "matches":["<all_urls>"]
   }]
 }

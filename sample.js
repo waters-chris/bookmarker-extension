@@ -109,7 +109,7 @@ function storeLocally(thingsToStore, clickedElement) {
       sendBookmarkContentToTab(thingsToStore.pageUrl, globalClickedTabId);
     });
 
-    })
+  })
 
   
 

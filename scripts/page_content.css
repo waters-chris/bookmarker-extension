@@ -1,0 +1,12 @@
+#bookmarker-extension {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.bookmarker-identified-note {
+  background-color: red;
+}

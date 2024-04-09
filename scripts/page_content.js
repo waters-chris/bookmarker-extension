@@ -2,7 +2,7 @@ console.log("content.js HERE WE GO!")
 
 var newContent = document.createElement('div');
 newContent.setAttribute('id', 'bookmarker-extension');
-newContent.setAttribute("style", "background-color: red; color: white; font-weight: bold; z-index: 9999; position: absolute; right: 0; top: 0;");
+// newContent.setAttribute("style", "background-color: red; color: white; font-weight: bold; z-index: 9999; position: absolute; right: 0; top: 0;");
 // newContent.innerHTML= '<h1>HERE</h1><p>' + title.textContent + '</p>';
 
 newContent.innerHTML = '<em>Loading...</em>';
@@ -82,7 +82,7 @@ identifiedNodes
     
     if (identifiedNode) {
       console.log("Identified Note:", identifiedNode)
-      identifiedNode.innerHTML = identifiedNode.innerHTML.replace(bookmarkContent.selected_text, '<span style="background-color: red;">' + bookmarkContent.selected_text  + '</span>')
+      identifiedNode.innerHTML = identifiedNode.innerHTML.replace(bookmarkContent.selected_text, '<span class="bookmarker-identified-note">' + bookmarkContent.selected_text  + '</span>')
       //identifiedNode.innerHTML = '<span style="background-color: red;">' + identifiedNode.innerHTML + '</span>';
     }
 

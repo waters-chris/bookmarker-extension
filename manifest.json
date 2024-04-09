@@ -3,7 +3,7 @@
   "name": "Bookmarker",
   "description": "Highlight and annotate parts of a page, as well as bookmarking pages.",
   "version": "1.0",
-  "permissions": ["sidePanel", "contextMenus", "storage"],
+  "permissions": ["contextMenus", "storage"],
   "background": {
     "service_worker": "background.js"
   },

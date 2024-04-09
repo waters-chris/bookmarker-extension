@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Hello Extensions V2",
-  "description": "Base Level Extension",
+  "name": "Bookmarker",
+  "description": "Highlight and annotate parts of a page, as well as bookmarking pages.",
   "version": "1.0",
   "permissions": ["sidePanel", "contextMenus", "storage"],
   "background": {
